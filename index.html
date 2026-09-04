@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101522"><title>Vocab 3600 — Enhanced</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><div class="brand">📚 <span>Vocab 3600</span></div><nav>
+<button data-view="dashboard">Dashboard</button><button data-view="words">Words</button><button data-view="quiz">Quiz</button><button data-view="review">Review</button><button data-view="tools">Import / Backup</button>
+</nav><button id="theme" class="small">☾</button></header>
+<main>
+<section id="dashboard" class="view active"><div class="hero"><div><h1>Your Vocabulary</h1><p>Build, review and master your English words.</p></div><button class="primary" onclick="openEditor()">＋ Add Word</button></div>
+<div class="stats"><div><b id="sTotal">0</b><span>Total</span></div><div><b id="sNew">0</b><span>New</span></div><div><b id="sLearning">0</b><span>Learning</span></div><div><b id="sLearned">0</b><span>Learned</span></div></div>
+<div class="grid2"><div class="panel"><h2>Progress</h2><div id="progress"></div></div><div class="panel"><h2>Today's review</h2><p id="reviewInfo"></p><button class="primary" onclick="showView('review')">Start Review →</button></div></div></section>
+<section id="words" class="view"><div class="sectionHead"><div><h1>Vocabulary</h1><p id="wordCount"></p></div><button class="primary" onclick="openEditor()">＋ Add Word</button></div>
+<div class="toolbar"><input id="search" placeholder="🔎 Search word, meaning, example..." oninput="renderWords()"><select id="status" onchange="renderWords()"><option value="all">All status</option><option>new</option><option>learning</option><option>learned</option><option value="favorite">favorite</option></select><select id="level" onchange="renderWords()"><option value="all">All levels</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select><select id="sort" onchange="renderWords()"><option value="az">A → Z</option><option value="za">Z → A</option><option value="newest">Newest</option></select></div><div id="wordList"></div></section>
+<section id="quiz" class="view"><div class="sectionHead"><div><h1>Quiz</h1><p>Test your vocabulary.</p></div><button class="primary" onclick="newQuiz()">New question</button></div><div id="quizBox" class="quiz"></div></section>
+<section id="review" class="view"><div class="sectionHead"><div><h1>Smart Review</h1><p>Review words that are due.</p></div><button class="primary" onclick="startReview()">Start</button></div><div id="reviewBox" class="quiz"></div></section>
+<section id="tools" class="view"><div class="sectionHead"><div><h1>Import & Backup</h1><p>Import Anki decks and protect your vocabulary + media.</p></div></div>
+<div class="toolGrid"><div class="panel"><h2>📥 Import Anki</h2><p>Choose an <b>.apkg</b> file. Standard Anki packages with <code>collection.anki2</code> and media are supported.</p><input id="ankiFile" type="file" accept=".apkg,application/zip" onchange="importAnki(this.files[0])"><div id="ankiStatus" class="statusBox"></div></div>
+<div class="panel"><h2>💾 Backup</h2><p>Exports words plus all locally stored images, audio and videos into one ZIP.</p><button class="primary" onclick="exportBackup()">Export Vocab3600 Backup</button><div class="spacer"></div><label class="fileBtn">Restore Backup <input id="backupFile" type="file" accept=".zip" onchange="restoreBackup(this.files[0])"></label><div id="backupStatus" class="statusBox"></div></div>
+<div class="panel"><h2>📦 Data</h2><p id="storageInfo"></p><button onclick="exportJSON()">Export words.json</button> <button onclick="document.getElementById('jsonFile').click()">Import JSON</button><input hidden id="jsonFile" type="file" accept="application/json,.json" onchange="importJSON(this.files[0])"></div>
+<div class="panel warning"><h2>⚠️ Important</h2><p>Your local media is stored in this browser's IndexedDB. GitHub Pages does not automatically upload it to GitHub. Use the ZIP backup regularly if the data matters.</p></div></div></section>
+</main>
+<div id="modal" class="modal hidden"><div class="modalCard"><div class="modalTop"><h2 id="modalTitle">Add Word</h2><button class="close" onclick="closeEditor()">×</button></div>
+<form id="wordForm"><input type="hidden" id="editId"><label>Word<input id="fWord" required></label><div class="two"><label>Meaning<input id="fMeaning"></label><label>Level<select id="fLevel"><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></label></div><div class="two"><label>IPA<input id="fIpa" placeholder="/ˈ.../"></label><label>Part of speech<input id="fPos" placeholder="noun, verb..."></label></div>
+<label>Examples <small>One example per line</small><textarea id="fExamples" rows="4"></textarea></label><div class="two"><label>Synonyms<input id="fSyn"></label><label>Antonyms<input id="fAnt"></label></div><label>Collocations<input id="fColl"></label><label>Word forms<input id="fForms"></label>
+<div class="mediaPicker"><h3>📷 Images from phone</h3><input id="fImageFiles" type="file" accept="image/*" multiple capture="environment"><div id="existingImages" class="filePreview"></div></div>
+<div class="mediaPicker"><h3>🎬 Videos from phone</h3><input id="fVideoFiles" type="file" accept="video/*" multiple><div id="existingVideos" class="filePreview"></div></div>
+<div class="mediaPicker"><h3>🔊 Audio from phone</h3><input id="fAudioFiles" type="file" accept="audio/*" multiple><div id="existingAudio" class="filePreview"></div></div>
+<label>External audio URL <input id="fAudio" placeholder="https://.../audio.mp3"></label><label>YouTube / external video URL <input id="fVideo" placeholder="https://youtube.com/..."></label><label>External image URLs <small>One URL per line</small><textarea id="fImages" rows="2"></textarea></label>
+<div class="formBtns"><button type="button" onclick="closeEditor()">Cancel</button><button class="primary">Save Word</button></div></form></div></div>
+<footer>Vocab 3600 Enhanced • Words + media stored locally in IndexedDB</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="app.js"></script>
+</body></html>
